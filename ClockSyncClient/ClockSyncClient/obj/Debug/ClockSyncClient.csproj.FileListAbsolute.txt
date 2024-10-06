@@ -1,0 +1,10 @@
+D:\ClockSyncClient\ClockSyncClient\obj\Debug\ClockSyncClient.csproj.AssemblyReference.cache
+D:\ClockSyncClient\ClockSyncClient\obj\Debug\ClockSyncClient.ClientForm.resources
+D:\ClockSyncClient\ClockSyncClient\obj\Debug\ClockSyncClient.Properties.Resources.resources
+D:\ClockSyncClient\ClockSyncClient\obj\Debug\ClockSyncClient.csproj.GenerateResource.cache
+D:\ClockSyncClient\ClockSyncClient\obj\Debug\ClockSyncClient.csproj.CoreCompileInputs.cache
+D:\ClockSyncClient\ClockSyncClient\bin\Debug\ClockSyncClient.exe.config
+D:\ClockSyncClient\ClockSyncClient\bin\Debug\ClockSyncClient.exe
+D:\ClockSyncClient\ClockSyncClient\bin\Debug\ClockSyncClient.pdb
+D:\ClockSyncClient\ClockSyncClient\obj\Debug\ClockSyncClient.exe
+D:\ClockSyncClient\ClockSyncClient\obj\Debug\ClockSyncClient.pdb
