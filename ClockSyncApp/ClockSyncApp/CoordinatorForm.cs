@@ -1,5 +1,8 @@
-﻿using System;
+﻿// Coordinator
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -9,93 +12,108 @@ namespace ClockSyncApp
     {
         private UdpHelper udpHelper;
         private int coordinatorPort = 8000;
-        private int clientPort = 8081;
-        private List<DateTime> clientTimes; // List of client times
+        private List<DateTime> clientTimes;
+        private List<IPEndPoint> clientEndpoints;
 
         public CoordinatorForm()
         {
             InitializeComponent();
             udpHelper = new UdpHelper(coordinatorPort);
             clientTimes = new List<DateTime>();
+            clientEndpoints = new List<IPEndPoint>();
 
-            // Start listening for client connections
             Thread listenThread = new Thread(ListenForClientConnections);
-            listenThread.IsBackground = true; // Set the thread as a background thread
+            listenThread.IsBackground = true;
             listenThread.Start();
         }
 
         private void ListenForClientConnections()
         {
             LogMessage("Waiting for client connections...");
-
             while (true)
             {
-                string clientResponse = udpHelper.Receive(); // Wait for a client time
-                DateTime clientTime = DateTime.Parse(clientResponse); // Parse the client time
-                clientTimes.Add(clientTime); // Add client time to the list
-                UpdateClientTimesDisplay(clientTime); // Update the display
-                LogMessage($"Client connected: {clientTime:HH:mm:ss}");
+                IPEndPoint clientEndpoint = new IPEndPoint(IPAddress.Any, 0);
+                string clientResponse = udpHelper.Receive(ref clientEndpoint);
+
+                DateTime clientTime = DateTime.Parse(clientResponse);
+                clientTimes.Add(clientTime);
+                clientEndpoints.Add(clientEndpoint);
+
+                UpdateClientTimesDisplay();
+                LogMessage($"Client connected: {clientTime:HH:mm:ss} from {clientEndpoint.Address}:{clientEndpoint.Port}");
             }
         }
 
-        private void UpdateClientTimesDisplay(DateTime clientTime)
+        private void UpdateClientTimesDisplay()
         {
             if (txtClientTimes.InvokeRequired)
             {
-                txtClientTimes.Invoke(new Action(() => UpdateClientTimesDisplay(clientTime))); // Marshal to UI thread
+                txtClientTimes.Invoke(new Action(UpdateClientTimesDisplay));
             }
             else
             {
-                txtClientTimes.AppendText($"- Client {clientTimes.Count}: {clientTime:HH:mm:ss} {Environment.NewLine}");
+                txtClientTimes.Clear();
+                for (int i = 0; i < clientTimes.Count; i++)
+                {
+                    txtClientTimes.AppendText($"- Client {i + 1}: {clientTimes[i]:HH:mm:ss} (IP: {clientEndpoints[i].Address}:{clientEndpoints[i].Port}){Environment.NewLine}");
+                }
             }
         }
 
         private void btnSync_Click(object sender, EventArgs e)
         {
-            if (clientTimes.Count == 0)
+            if (clientTimes.Count == 0 || clientEndpoints.Count == 0)
             {
-                LogMessage("No client connected.");
+                LogMessage("No clients connected.");
                 return;
             }
 
-            // Proceed with synchronization
-            udpHelper.Send("TIME_REQUEST", "255.255.255.255", clientPort); // Broadcast time request
-            LogMessage("Sent request to all clients.");
-
-            Thread listenThread = new Thread(ListenForClientResponses);
-            listenThread.IsBackground = true; // Set the thread as a background thread
-            listenThread.Start();
-        }
-
-        private void ListenForClientResponses()
-        {
-            LogMessage("Waiting for client responses...");
+            List<DateTime> receivedClientTimes = new List<DateTime>();
 
             for (int i = 0; i < clientTimes.Count; i++)
             {
-                string clientResponse = udpHelper.Receive(); // Receive client time
-                DateTime clientTime = DateTime.Parse(clientResponse); // Parse the client time
-                LogMessage($" - Response from client {i + 1}: {clientTime:HH:mm:ss}");
+                receivedClientTimes.Add(clientTimes[i]); // Add the already collected client times
             }
 
-            // Continue with average time calculation and adjustments...
+            DateTime averageTime = CalculateAverageTime(receivedClientTimes);
+            LogMessage($"Calculated average time: {averageTime:HH:mm:ss}");
+
+            for (int i = 0; i < receivedClientTimes.Count; i++)
+            {
+                TimeSpan timeDifference = averageTime - receivedClientTimes[i];
+                AdjustClientTime(clientEndpoints[i], timeDifference);
+            }
         }
 
-        private void LogMessage(string message)
+        private DateTime CalculateAverageTime(List<DateTime> times)
         {
-            if (txtMessageLog.InvokeRequired) // Check if the call is from a different thread
-            {
-                txtMessageLog.Invoke(new Action<string>(LogMessage), message); // Invoke the method on the UI thread
-            }
-            else
-            {
-                txtMessageLog.AppendText(message + Environment.NewLine); // Append text if already on the UI thread
-            }
+            long totalTicks = times.Sum(time => time.Ticks);
+            long averageTicks = totalTicks / times.Count;
+            return new DateTime(averageTicks);
+        }
+
+        private void AdjustClientTime(IPEndPoint clientEndpoint, TimeSpan adjustment)
+        {
+            string adjustmentMessage = $"{adjustment.TotalSeconds}"; // Only send the difference in seconds
+            udpHelper.Send(adjustmentMessage, clientEndpoint.Address.ToString(), clientEndpoint.Port);
+            LogMessage($"Sent time adjustment of {adjustment.TotalSeconds} seconds to {clientEndpoint.Address}:{clientEndpoint.Port}");
         }
 
         private void timer1_Tick(object sender, EventArgs e)
         {
             coordinatorTimeLbl.Text = DateTime.Now.ToString("HH:mm:ss");
+        }
+
+        private void LogMessage(string message)
+        {
+            if (txtMessageLog.InvokeRequired)
+            {
+                txtMessageLog.Invoke(new Action<string>(LogMessage), message);
+            }
+            else
+            {
+                txtMessageLog.AppendText(message + Environment.NewLine);
+            }
         }
     }
 }

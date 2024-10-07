@@ -25,11 +25,13 @@ namespace ClockSyncApp
             udpClient.Send(data, data.Length, ipAddress, remotePort); // Send data over UDP
         }
 
-        public string Receive()
+        public string Receive(ref IPEndPoint clientEndpoint)
         {
-            IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, port); // Listening on any IP
-            byte[] data = udpClient.Receive(ref endPoint); // Receive data
-            return Encoding.ASCII.GetString(data); // Convert data to string
+            //IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, port); // Listening on any IP
+            //byte[] data = udpClient.Receive(ref endPoint); // Receive data
+            //return Encoding.ASCII.GetString(data); // Convert data to string
+            byte[] data = udpClient.Receive(ref clientEndpoint); // Receive data along with sender's info
+            return Encoding.UTF8.GetString(data); // Convert bytes to string
         }
     }
 }

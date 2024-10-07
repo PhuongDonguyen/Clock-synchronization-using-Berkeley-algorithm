@@ -8,3 +8,13 @@ D:\ClockSyncClient\ClockSyncClient\bin\Debug\ClockSyncClient.exe
 D:\ClockSyncClient\ClockSyncClient\bin\Debug\ClockSyncClient.pdb
 D:\ClockSyncClient\ClockSyncClient\obj\Debug\ClockSyncClient.exe
 D:\ClockSyncClient\ClockSyncClient\obj\Debug\ClockSyncClient.pdb
+D:\Clock Sync Berkeley\ClockSyncClient\ClockSyncClient\bin\Debug\ClockSyncClient.exe.config
+D:\Clock Sync Berkeley\ClockSyncClient\ClockSyncClient\bin\Debug\ClockSyncClient.exe
+D:\Clock Sync Berkeley\ClockSyncClient\ClockSyncClient\obj\Debug\ClockSyncClient.csproj.AssemblyReference.cache
+D:\Clock Sync Berkeley\ClockSyncClient\ClockSyncClient\obj\Debug\ClockSyncClient.ClientForm.resources
+D:\Clock Sync Berkeley\ClockSyncClient\ClockSyncClient\obj\Debug\ClockSyncClient.Properties.Resources.resources
+D:\Clock Sync Berkeley\ClockSyncClient\ClockSyncClient\obj\Debug\ClockSyncClient.csproj.GenerateResource.cache
+D:\Clock Sync Berkeley\ClockSyncClient\ClockSyncClient\obj\Debug\ClockSyncClient.csproj.CoreCompileInputs.cache
+D:\Clock Sync Berkeley\ClockSyncClient\ClockSyncClient\obj\Debug\ClockSyncClient.exe
+D:\Clock Sync Berkeley\ClockSyncClient\ClockSyncClient\obj\Debug\ClockSyncClient.pdb
+D:\Clock Sync Berkeley\ClockSyncClient\ClockSyncClient\bin\Debug\ClockSyncClient.pdb
